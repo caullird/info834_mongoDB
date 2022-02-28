@@ -1,20 +1,21 @@
 (async () => {
     // Requiring module
     const mongoose = require('mongoose');
-    
+    const { Schema } = mongoose;
+
     // Connecting to database
     await mongoose.connect('mongodb://127.0.0.1:27017/Mailing');
     
-// Creating Schemas
+    // Creating Schemas
     const UserSchema = new mongoose.Schema({
-        id: String,
+        id: Schema.Types.ObjectId,
         name: String,
         firstname: String,
         email: String,
     });
     
     const ListSchema = new mongoose.Schema({
-        id: String,
+        id: Schema.Types.ObjectId,
         name: String,
         users: [{
             type: mongoose.Schema.Types.ObjectId,
@@ -23,10 +24,19 @@
     })
     
     // Creating models from userSchema and postSchema
-    const User = mongoose.model("User", UserSchema);
     const List = mongoose.model("Lists", ListSchema);
+    const User = mongoose.model("User", UserSchema);
 
-    let list1 = await List.findOne({name: "Mailing-List 1"}).populate("users");
+    module.exports = {
+        List, User
+    }
+    
+    List.find({"name" : "Mailing-List 1"})
+        .populate("users")
+        .exec(function (err, res){
+            if (err) throw err;
+            console.log(res)
+        });
 
     // process.exit()
 })();
